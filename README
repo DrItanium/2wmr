@@ -1,18 +1,19 @@
-2wm - stereo window manager
-===========================
+2wm-electron - stereo window manager with expert system support
+===============================================================
 2wm is an extremely fast, small, and dynamic window manager for X. It is the
-little brother of dwm.
-
+little brother of dwm. This is a fork of 2wm that adds expert system support
+for research purposes.
 
 Requirements
 ------------
-In order to build 2wm you need the Xlib header files.
+In order to build 2wm you need the Xlib header files as well as an electron and
+electron-filesystem installation. 
 
 
 Installation
 ------------
 Edit config.mk to match your local setup (2wm is installed into
-the /usr/local namespace by default).
+the $ElectronFSRoot/sys/ namespace by default).
 
 Afterwards enter the following command to build and install 2wm (if
 necessary as root):
@@ -36,4 +37,4 @@ the DISPLAY environment variable is set correctly, e.g.:
 Configuration
 -------------
 The configuration of 2wm is done by creating a custom config.h
-and (re)compiling the source code.
+and (re)compiling the source code. 

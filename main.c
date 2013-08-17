@@ -141,6 +141,7 @@ main(int argc, char *argv[]) {
 	XEvent ev;
 	XModifierKeymap *modmap;
 	XSetWindowAttributes wa;
+   theEnv = CreateEnvironment();
 
 	if(argc == 2 && !strncmp("-v", argv[1], 3))
 		eprint("2wm-"VERSION", (C)opyright MMVII Anselm R. Garbe\n");
@@ -218,5 +219,6 @@ main(int argc, char *argv[]) {
 	}
 	cleanup();
 	XCloseDisplay(dpy);
+   DestroyEnvironment(theEnv);
 	return 0;
 }

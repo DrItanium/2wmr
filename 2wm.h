@@ -4,13 +4,17 @@
 
 #include "config.h"
 #include <X11/Xlib.h>
+#include <electron/clips.h>
+
 
 /* mask shorthands, used in event.c and client.c */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
+void* theEnv;
 
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMLast };	/* default atoms */
 enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
+
 
 typedef union {
 	const char *cmd;

@@ -9,6 +9,7 @@
 
 /* mask shorthands, used in event.c and client.c */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
+/* electron environment pointer */
 void* theEnv;
 
 enum { NetSupported, NetWMName, NetLast };		/* EWMH atoms */

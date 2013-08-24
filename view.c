@@ -94,12 +94,12 @@ arrange(void) {
 			c->x = sx;
 			c->y = sy;
 			if(i < nmaster) {
+				c->x += tw;
 				c->y += i * mh;
 				c->w = mw - 2 * BORDERPX;
 				c->h = mh - 2 * BORDERPX;
 			}
 			else {  /* tile window */
-				c->x += mw;
 				c->w = tw - 2 * BORDERPX;
 				if(th > 2 * BORDERPX) {
 					c->y += (i - nmaster) * th;

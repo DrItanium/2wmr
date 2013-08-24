@@ -1,5 +1,6 @@
 # 2wm - stereo window manager
-#   (C)opyright MMVII Anselm R. Garbe
+#   Original Code (C)opyright MMVII Anselm R. Garbe
+#   Changes (C) MMXIV Joshua W. Scoggins
 
 include config.mk
 

@@ -1,13 +1,13 @@
-2wm-electron - stereo window manager with expert system support
+2wmr - stereo window manager reversed
 ===============================================================
-2wm is an extremely fast, small, and dynamic window manager for X. It is the
-little brother of dwm. This is a fork of 2wm that adds expert system support
-for research purposes.
+2wm is an extremely fast, small, and dynamic window manager for X. I have 
+reversed the layout so that the primary window starts in the middle of the 
+screen. This cuts down on the amount of searching that I have to do when
+programming.
 
 Requirements
 ------------
-In order to build 2wm you need the Xlib header files as well as an electron and
-electron-filesystem installation. 
+In order to build 2wm you need the Xlib header files.
 
 
 Installation

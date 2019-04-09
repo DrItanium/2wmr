@@ -4,20 +4,20 @@
 
 include config.mk
 
-SRC = client.c event.c main.c util.c view.c
-OBJ = ${SRC:.c=.o}
+SRC = client.cc event.cc main.cc util.cc view.cc
+OBJ = ${SRC:.cc=.o}
 
 all: options 2wm
 
 options:
-	@echo 2wm build options:
-	@echo "CFLAGS   = ${CFLAGS}"
+	@echo 2wmrxx build options:
+	@echo "CXXFLAGS   = ${CXXFLAGS}"
 	@echo "LDFLAGS  = ${LDFLAGS}"
-	@echo "CC       = ${CC}"
+	@echo "CXX       = ${CXX}"
 
-.c.o:
-	@echo CC $<
-	@${CC} -c ${CFLAGS} $<
+.cc.o:
+	@echo CXX $<
+	@${CXX} -c ${CXXFLAGS} $<
 
 ${OBJ}: 2wm.h config.h config.mk
 
@@ -26,8 +26,8 @@ config.h:
 	@cp config.default.h $@
 
 2wm: ${OBJ}
-	@echo CC -o $@
-	@${CC} -o $@ ${OBJ} ${LDFLAGS}
+	@echo CXX -o $@
+	@${CXX} -o $@ ${OBJ} ${LDFLAGS}
 	@strip $@
 
 clean:

@@ -1,10 +1,10 @@
-# 2wm version
-VERSION = 0.2
+# 2wmrxx version
+VERSION = 0.3
 
 # Customize below to fit your system
 
 # paths
-PREFIX = $(ElectronFSRoot)/sys
+PREFIX = ${HOME}/sys/2wmrxx
 MANPREFIX = ${PREFIX}/share/man
 
 X11INC = /usr/X11R6/include
@@ -15,7 +15,7 @@ INCS = -I. -I/usr/include -I${X11INC}
 LIBS = -L/usr/lib -lc -L${X11LIB} -lX11 
 
 # flags
-CFLAGS = -Os ${INCS} -DVERSION=\"${VERSION}\"
+CXXFLAGS = -std=c++17 -Os ${INCS} -DVERSION=\"${VERSION}\"
 LDFLAGS = ${LIBS}
 #CFLAGS = -g -Wall -O2 ${INCS} -DVERSION=\"${VERSION}\"
 #LDFLAGS = -g ${LIBS}
@@ -26,4 +26,4 @@ LDFLAGS = ${LIBS}
 #CFLAGS += -xtarget=ultra
 
 # compiler and linker
-CC = cc
+CXX = c++

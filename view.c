@@ -21,37 +21,48 @@ static unsigned int reglen = 0;
 
 static Client *
 getnext(Client *c) {
+    ENTER_FUNC;
 	for(; c && c->view != view; c = c->next);
+    EXIT_FUNC;
 	return c;
 }
 
 static Client *
 getprev(Client *c) {
+    ENTER_FUNC;
 	for(; c && c->view != view; c = c->prev);
+    EXIT_FUNC;
 	return c;
 }
 
 static Client *
 nexttiled(Client *c) {
+    ENTER_FUNC;
 	for(c = getnext(c); c && c->isfloat; c = getnext(c->next));
+    EXIT_FUNC;
 	return c;
 }
 
 static void
 pop(Client *c) {
+    ENTER_FUNC;
 	detachclient(c);
 	if(clients)
 		clients->prev = c;
 	c->next = clients;
 	clients = c;
+    EXIT_FUNC;
 }
 
 static void
 togglemax(Client *c) {
 	XEvent ev;
 		
-	if(c->isfixed)
+    ENTER_FUNC;
+	if(c->isfixed) {
+        EXIT_FUNC;
 		return;
+    }
 
 	if((c->ismax = !c->ismax)) {
 		c->rx = c->x; c->x = sx;
@@ -67,6 +78,7 @@ togglemax(Client *c) {
 	}
 	resize(c, True);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+    EXIT_FUNC;
 }
 
 /* extern */
@@ -76,6 +88,7 @@ arrange(void) {
 	unsigned int i, n, mw, mh, tw, th;
 	Client *c;
 
+    ENTER_FUNC;
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 	/* window geoms */
@@ -118,50 +131,65 @@ arrange(void) {
 		focus(c);
 	}
 	restack();
+    EXIT_FUNC;
 }
 
 void
 attach(Arg *arg) {
 	Client *c;
 
+    ENTER_FUNC;
 	for(c = clients; c && c->view == view; c = c->next);
-	if(!c)
+	if(!c) {
+        EXIT_FUNC;
 		return;
+    }
 	c->view = !c->view;
 	pop(c);
 	focus(c);
 	arrange();
+    EXIT_FUNC;
 }
 
 void
 detach(Arg *arg) {
-	if(!sel)
+    ENTER_FUNC;
+	if(!sel) {
+        EXIT_FUNC;
 		return;
+    }
 	sel->view = !sel->view;
 	pop(sel);
 	arrange();
+    EXIT_FUNC;
 }
 
 void
 focusnext(Arg *arg) {
 	Client *c;
-   
-	if(!sel)
+    ENTER_FUNC;
+	if(!sel) {
+        EXIT_FUNC;
 		return;
+    }
 	if(!(c = getnext(sel->next)))
 		c = getnext(clients);
 	if(c) {
 		focus(c);
 		restack();
 	}
+    EXIT_FUNC;
 }
 
 void
 focusprev(Arg *arg) {
 	Client *c;
 
-	if(!sel)
+    ENTER_FUNC;
+	if(!sel) {
+        EXIT_FUNC;
 		return;
+    }
 	if(!(c = getprev(sel->prev))) {
 		for(c = clients; c && c->next; c = c->next);
 		c = getprev(c);
@@ -170,24 +198,31 @@ focusprev(Arg *arg) {
 		focus(c);
 		restack();
 	}
+    EXIT_FUNC;
 }
 
 void
 incnmaster(Arg *arg) {
-	if((nmaster + arg->i < 1) || (sh / (nmaster + arg->i) <= 2 * BORDERPX))
+    ENTER_FUNC;
+	if((nmaster + arg->i < 1) || (sh / (nmaster + arg->i) <= 2 * BORDERPX)) {
+        EXIT_FUNC;
 		return;
+    }
 	nmaster += arg->i;
 	if(sel)
 		arrange();
+    EXIT_FUNC;
 }
 
 void
 initrregs(void) {
 	unsigned int i;
 	regex_t *reg;
-
-	if(rreg)
+    ENTER_FUNC;
+	if(rreg) {
+        EXIT_FUNC;
 		return;
+    }
 	for(reglen = 0; floats[reglen]; reglen++);
 	rreg = emallocz(reglen * sizeof(RReg));
 	for(i = 0; i < reglen; i++)
@@ -198,6 +233,7 @@ initrregs(void) {
 			else
 				rreg[i].regex = reg;
 		}
+    EXIT_FUNC;
 }
 
 Bool
@@ -207,7 +243,7 @@ isfloat(Client *c) {
 	regmatch_t tmp;
 	Bool ret = False;
 	XClassHint ch = { 0 };
-
+    ENTER_FUNC;
 	XGetClassHint(dpy, c->win, &ch);
 	snprintf(prop, sizeof prop, "%s:%s:%s",
 			ch.res_class ? ch.res_class : "",
@@ -221,11 +257,13 @@ isfloat(Client *c) {
 		XFree(ch.res_class);
 	if(ch.res_name)
 		XFree(ch.res_name);
+    EXIT_FUNC;
 	return ret;
 }
 
 void
 resizemaster(Arg *arg) {
+    ENTER_FUNC;
 	if(arg->i == 0)
 		master = MASTER;
 	else {
@@ -235,6 +273,7 @@ resizemaster(Arg *arg) {
 		master += arg->i;
 	}
 	arrange();
+    EXIT_FUNC;
 }
 
 void
@@ -242,8 +281,11 @@ restack(void) {
 	Client *c;
 	XEvent ev;
 
-	if(!sel)
+    ENTER_FUNC;
+	if(!sel) {
+        EXIT_FUNC;
 		return;
+    }
 	if(sel->isfloat)
 		XRaiseWindow(dpy, sel->win);
 	else
@@ -255,40 +297,53 @@ restack(void) {
 	}
 	XSync(dpy, False);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+    EXIT_FUNC;
 }
 
 void
 togglefloat(Arg *arg) {
-	if(!sel)
+    ENTER_FUNC;
+	if(!sel) {
+        EXIT_FUNC;
 		return;
+    }
 	sel->isfloat = !sel->isfloat;
 	arrange();
+    EXIT_FUNC;
 }
 
 void
 toggleview(Arg *arg) {
+    ENTER_FUNC;
 	view = !view;
 	arrange();
+    EXIT_FUNC;
 }
 
 void
 zoom(Arg *arg) {
 	unsigned int n;
 	Client *c;
-
-	if(!sel)
+    ENTER_FUNC;
+	if(!sel) {
+        EXIT_FUNC;
 		return;
+    }
 	if(sel->isfloat) {
 		togglemax(sel);
+        EXIT_FUNC;
 		return;
 	}
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
 		n++;
 
 	if((c = sel) == nexttiled(clients))
-		if(!(c = nexttiled(c->next)))
+		if(!(c = nexttiled(c->next))) {
+            EXIT_FUNC;
 			return;
+        }
 	pop(c);
 	focus(c);
 	arrange();
+    EXIT_FUNC;
 }

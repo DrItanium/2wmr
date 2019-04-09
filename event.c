@@ -69,11 +69,14 @@ resizemouse(Client *c) {
 	int nw, nh;
 	XEvent ev;
 
+    ENTER_FUNC;
 	ocx = c->x;
 	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-			None, cursor[CurResize], CurrentTime) != GrabSuccess)
+			None, cursor[CurResize], CurrentTime) != GrabSuccess) {
+        EXIT_FUNC;
 		return;
+    }
 	c->ismax = False;
 	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->border - 1, c->h + c->border - 1);
 	for(;;) {
@@ -85,6 +88,7 @@ resizemouse(Client *c) {
 					c->w + c->border - 1, c->h + c->border - 1);
 			XUngrabPointer(dpy, CurrentTime);
 			while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
+            EXIT_FUNC;
 			return;
 		case ConfigureRequest:
 		case MapRequest:
@@ -100,6 +104,7 @@ resizemouse(Client *c) {
 			break;
 		}
 	}
+    EXIT_FUNC;
 }
 
 static void
@@ -107,10 +112,13 @@ buttonpress(XEvent *e) {
 	Client *c;
 	XButtonPressedEvent *ev = &e->xbutton;
 
+    ENTER_FUNC;
 	if((c = getclient(ev->window))) {
 		focus(c);
-		if(CLEANMASK(ev->state) != MODKEY)
+		if(CLEANMASK(ev->state) != MODKEY) {
+            EXIT_FUNC;
 			return;
+        }
 		if(ev->button == Button1 && c->isfloat) {
 			restack();
 			movemouse(c);
@@ -122,6 +130,7 @@ buttonpress(XEvent *e) {
 			resizemouse(c);
 		}
 	}
+    EXIT_FUNC;
 }
 
 static void
@@ -131,6 +140,7 @@ configurerequest(XEvent *e) {
 	XConfigureRequestEvent *ev = &e->xconfigurerequest;
 	XWindowChanges wc;
 
+    ENTER_FUNC;
 	if((c = getclient(ev->window))) {
 		c->ismax = False;
 		if(ev->value_mask & CWX)
@@ -172,6 +182,7 @@ configurerequest(XEvent *e) {
 		XConfigureWindow(dpy, ev->window, ev->value_mask, &wc);
 		XSync(dpy, False);
 	}
+    EXIT_FUNC;
 }
 
 static void
@@ -179,17 +190,21 @@ destroynotify(XEvent *e) {
 	Client *c;
 	XDestroyWindowEvent *ev = &e->xdestroywindow;
 
+    ENTER_FUNC;
 	if((c = getclient(ev->window)))
 		unmanage(c);
+    EXIT_FUNC;
 }
 
 static void
 enternotify(XEvent *e) {
 	Client *c;
 	XCrossingEvent *ev = &e->xcrossing;
-
-	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior)
+    ENTER_FUNC;
+	if(ev->mode != NotifyNormal || ev->detail == NotifyInferior) {
+        EXIT_FUNC;
 		return;
+    }
 	if((c = getclient(ev->window)) && c->view == view)
 		focus(c);
 	else if(ev->window == root) {
@@ -197,6 +212,7 @@ enternotify(XEvent *e) {
 		for(c = stack; c && c->view != view; c = c->snext);
 		focus(c);
 	}
+    EXIT_FUNC;
 }
 
 static void
@@ -206,6 +222,7 @@ keypress(XEvent *e) {
 	KeySym keysym;
 	XKeyEvent *ev = &e->xkey;
 
+    ENTER_FUNC;
 	keysym = XKeycodeToKeysym(dpy, (KeyCode)ev->keycode, 0);
 	for(i = 0; i < len; i++) {
 		if(keysym == key[i].keysym
@@ -215,25 +232,30 @@ keypress(XEvent *e) {
 				key[i].func(&key[i].arg);
 		}
 	}
+    EXIT_FUNC;
 }
 
 static void
 leavenotify(XEvent *e) {
 	XCrossingEvent *ev = &e->xcrossing;
 
+    ENTER_FUNC;
 	if((ev->window == root) && !ev->same_screen) {
 		selscreen = False;
 		focus(NULL);
 	}
+    EXIT_FUNC;
 }
 
 static void
 mappingnotify(XEvent *e) {
 	XMappingEvent *ev = &e->xmapping;
 
+    ENTER_FUNC;
 	XRefreshKeyboardMapping(ev);
 	if(ev->request == MappingKeyboard)
 		grabkeys();
+    EXIT_FUNC;
 }
 
 static void
@@ -241,12 +263,18 @@ maprequest(XEvent *e) {
 	static XWindowAttributes wa;
 	XMapRequestEvent *ev = &e->xmaprequest;
 
-	if(!XGetWindowAttributes(dpy, ev->window, &wa))
+    ENTER_FUNC;
+	if(!XGetWindowAttributes(dpy, ev->window, &wa)) {
+        EXIT_FUNC;
 		return;
-	if(wa.override_redirect)
+    }
+	if(wa.override_redirect) {
+        EXIT_FUNC;
 		return;
+    }
 	if(!getclient(ev->window))
 		manage(ev->window, &wa);
+    EXIT_FUNC;
 }
 
 static void
@@ -255,8 +283,11 @@ propertynotify(XEvent *e) {
 	Window trans;
 	XPropertyEvent *ev = &e->xproperty;
 
-	if(ev->state == PropertyDelete)
+    ENTER_FUNC;
+	if(ev->state == PropertyDelete) {
+        EXIT_FUNC;
 		return; /* ignore */
+    }
 	if((c = getclient(ev->window))) {
 		switch (ev->atom) {
 			default: break;
@@ -270,6 +301,7 @@ propertynotify(XEvent *e) {
 				break;
 		}
 	}
+    EXIT_FUNC;
 }
 
 static void
@@ -277,8 +309,10 @@ unmapnotify(XEvent *e) {
 	Client *c;
 	XUnmapEvent *ev = &e->xunmap;
 
+    ENTER_FUNC;
 	if((c = getclient(ev->window)))
 		unmanage(c);
+    EXIT_FUNC;
 }
 
 /* extern */
@@ -302,6 +336,7 @@ grabkeys(void) {
 	unsigned int i;
 	KeyCode code;
 
+    ENTER_FUNC;
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	for(i = 0; i < len; i++) {
 		code = XKeysymToKeycode(dpy, key[i].keysym);
@@ -314,4 +349,5 @@ grabkeys(void) {
 		XGrabKey(dpy, code, key[i].mod | numlockmask | LockMask, root, True,
 				GrabModeAsync, GrabModeAsync);
 	}
+    EXIT_FUNC;
 }

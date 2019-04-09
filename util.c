@@ -61,10 +61,10 @@ spawn(Arg *arg) {
 
 void
 enterFunction(HERE_DECL__) {
-    fprintf(stderr, "%s, %d: Entered function %s\n", file, line, func);
+    fprintf(stderr, "%s, %ld: Entered function %s\n", file, line, func);
 }
 
 void
 exitFunction(HERE_DECL__) {
-    fprintf(stderr, "%s, %d: Exiting function %s\n", file, line, func);
+    fprintf(stderr, "%s, %ld: Exiting function %s\n", file, line, func);
 }

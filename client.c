@@ -12,13 +12,16 @@
 static void
 detachstack(Client *c) {
 	Client **tc;
+    ENTER_FUNC;
 	for(tc=&stack; *tc && *tc != c; tc=&(*tc)->snext);
 	*tc = c->snext;
+    EXIT_FUNC;
 }
 
 static void
 grabbuttons(Client *c, Bool focused) {
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
+    ENTER_FUNC;
 
 	if(focused) {
 		XGrabButton(dpy, Button1, MODKEY, c->win, False, BUTTONMASK,
@@ -51,17 +54,22 @@ grabbuttons(Client *c, Bool focused) {
 	else
 		XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
+    EXIT_FUNC;
 }
 
 static void
 setclientstate(Client *c, long state) {
 	long data[] = {state, None};
+    ENTER_FUNC;
 	XChangeProperty(dpy, c->win, wmatom[WMState], wmatom[WMState], 32,
 			PropModeReplace, (unsigned char *)data, 2);
+    EXIT_FUNC;
 }
 
 static int
 xerrordummy(Display *dsply, XErrorEvent *ee) {
+    ENTER_FUNC;
+    EXIT_FUNC;
 	return 0;
 }
 
@@ -71,6 +79,7 @@ void
 configure(Client *c) {
 	XEvent synev;
 
+    ENTER_FUNC;
 	synev.type = ConfigureNotify;
 	synev.xconfigure.display = dpy;
 	synev.xconfigure.event = c->win;
@@ -82,10 +91,12 @@ configure(Client *c) {
 	synev.xconfigure.border_width = c->border;
 	synev.xconfigure.above = None;
 	XSendEvent(dpy, c->win, True, NoEventMask, &synev);
+    EXIT_FUNC;
 }
 
 void
 detachclient(Client *c) {
+    ENTER_FUNC;
 	if(c->prev)
 		c->prev->next = c->next;
 	if(c->next)
@@ -93,12 +104,16 @@ detachclient(Client *c) {
 	if(c == clients)
 		clients = c->next;
 	c->next = c->prev = NULL;
+    EXIT_FUNC;
 }
 
 void
 focus(Client *c) {
-	if(c && c->view != view)
+    ENTER_FUNC;
+	if(c && c->view != view) {
+        EXIT_FUNC;
 		return;
+    }
 	if(sel && sel != c) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, normcol);
@@ -110,23 +125,30 @@ focus(Client *c) {
 		grabbuttons(c, True);
 	}
 	sel = c;
-	if(!selscreen)
+	if(!selscreen) {
+        EXIT_FUNC;
 		return;
+    }
 	if(c) {
 		XSetWindowBorder(dpy, c->win, selcol);
 		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
 	}
 	else
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+    EXIT_FUNC;
 }
 
 Client *
 getclient(Window w) {
 	Client *c;
 
+    ENTER_FUNC;
 	for(c = clients; c; c = c->next)
-		if(c->win == w)
+		if(c->win == w) {
+            EXIT_FUNC;
 			return c;
+        }
+    EXIT_FUNC;
 	return NULL;
 }
 
@@ -136,23 +158,29 @@ isprotodel(Client *c) {
 	Atom *protocols;
 	Bool ret = False;
 
+    ENTER_FUNC;
 	if(XGetWMProtocols(dpy, c->win, &protocols, &n)) {
 		for(i = 0; !ret && i < n; i++)
 			if(protocols[i] == wmatom[WMDelete])
 				ret = True;
 		XFree(protocols);
 	}
+    EXIT_FUNC;
 	return ret;
 }
 
 void
 killclient(Arg *arg) {
-	if(!sel)
+    ENTER_FUNC;
+	if(!sel) {
+        EXIT_FUNC;
 		return;
+    }
 	if(isprotodel(sel))
 		sendevent(sel->win, wmatom[WMProtocols], wmatom[WMDelete]);
 	else
 		XKillClient(dpy, sel->win);
+    EXIT_FUNC;
 }
 
 void
@@ -160,6 +188,7 @@ manage(Window w, XWindowAttributes *wa) {
 	Client *c, *t;
 	Window trans;
 
+    ENTER_FUNC;
 	c = emallocz(sizeof(Client));
 	c->win = w;
 	c->x = wa->x;
@@ -206,6 +235,7 @@ manage(Window w, XWindowAttributes *wa) {
 	if(c->view == view)
 		focus(c);
 	arrange();
+    EXIT_FUNC;
 }
 
 void
@@ -213,8 +243,11 @@ resize(Client *c, Bool sizehints) {
 	float actual, dx, dy, max, min;
 	XWindowChanges wc;
 
-	if(c->w <= 0 || c->h <= 0)
+    ENTER_FUNC;
+	if(c->w <= 0 || c->h <= 0) {
+        EXIT_FUNC;
 		return;
+    }
 	if(sizehints) {
 		if(c->minw && c->w < c->minw)
 			c->w = c->minw;
@@ -272,6 +305,7 @@ resize(Client *c, Bool sizehints) {
 	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
 	configure(c);
 	XSync(dpy, False);
+    EXIT_FUNC;
 }
 
 void
@@ -279,6 +313,7 @@ updatesizehints(Client *c) {
 	long msize;
 	XSizeHints size;
 
+    ENTER_FUNC;
 	if(!XGetWMNormalHints(dpy, c->win, &size, &msize) || !size.flags)
 		size.flags = PSize;
 	c->flags = size.flags;
@@ -316,6 +351,7 @@ updatesizehints(Client *c) {
 		c->minax = c->minay = c->maxax = c->maxay = 0;
 	c->isfixed = (c->maxw && c->minw && c->maxh && c->minh &&
 				c->maxw == c->minw && c->maxh == c->minh);
+    EXIT_FUNC;
 }
 
 void
@@ -324,6 +360,7 @@ updatetitle(Client *c) {
 	int n;
 	XTextProperty name;
 
+    ENTER_FUNC;
 	name.nitems = 0;
 	c->name[0] = 0;
 	XGetTextProperty(dpy, c->win, &name, netatom[NetWMName]);
@@ -342,12 +379,14 @@ updatetitle(Client *c) {
 		}
 	}
 	XFree(name.value);
+    EXIT_FUNC;
 }
 
 void
 unmanage(Client *c) {
 	Client *nc;
 
+    ENTER_FUNC;
 	/* The server grab construct avoids race conditions. */
 	XGrabServer(dpy);
 	XSetErrorHandler(xerrordummy);
@@ -364,4 +403,5 @@ unmanage(Client *c) {
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
 	arrange();
+    EXIT_FUNC;
 }

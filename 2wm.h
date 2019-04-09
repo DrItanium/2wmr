@@ -49,6 +49,8 @@ struct Client {
     void unmanage();
     void pop();
     bool isFloat();
+    void togglemax();
+    
 
     ~Client();
 };

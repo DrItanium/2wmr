@@ -48,26 +48,26 @@ Client::pop() {
 	clients = this;
 }
 
-static void
-togglemax(Client *c) {
+void
+Client::togglemax() {
 	XEvent ev;
 		
-	if(c->isfixed)
+	if(this->isfixed) {
 		return;
+    }
 
-	if((c->ismax = !c->ismax)) {
-		c->rx = c->x; c->x = sx;
-		c->ry = c->y; c->y = sy;
-		c->rw = c->w; c->w = sw - 2 * BORDERPX;
-		c->rh = c->h; c->h = sh - 2 * BORDERPX;
+	if((ismax = !ismax)) {
+		this->rx = this->x; this->x = sx;
+		this->ry = this->y; this->y = sy;
+		this->rw = this->w; this->w = sw - 2 * BORDERPX;
+		this->rh = this->h; this->h = sh - 2 * BORDERPX;
+	} else {
+		this->x = this->rx;
+		this->y = this->ry;
+		this->w = this->rw;
+		this->h = this->rh;
 	}
-	else {
-		c->x = c->rx;
-		c->y = c->ry;
-		c->w = c->rw;
-		c->h = c->rh;
-	}
-    c->resize(true);
+    this->resize(true);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
@@ -294,7 +294,7 @@ zoom(Arg *arg) {
 		return;
     }
 	if(sel->isfloat) {
-		togglemax(sel);
+        sel->togglemax();
 		return;
 	}
 	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next)) {

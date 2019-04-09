@@ -8,8 +8,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+static int functionDepth = 0;
 /* extern */
-
 void *
 emallocz(unsigned int size) {
 	void *res = calloc(1, size);
@@ -63,10 +63,12 @@ spawn(Arg *arg) {
 
 void
 enterFunction(HERE_DECL__) {
-    fprintf(stderr, "%s, %ld: Entered function %s\n", file, line, func);
+    fprintf(stderr, "(%d) %s, %ld: Entered function %s\n", functionDepth, file, line, func);
+    ++functionDepth;
 }
 
 void
 exitFunction(HERE_DECL__) {
-    fprintf(stderr, "%s, %ld: Exiting function %s\n", file, line, func);
+    --functionDepth;
+    fprintf(stderr, "(%d) %s, %ld: Exiting function %s\n", functionDepth, file, line, func);
 }

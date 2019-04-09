@@ -9,6 +9,7 @@
 #include <utility>
 #include <iostream>
 #include <cstdint>
+#include <list>
 
 using ulong = unsigned long;
 using uint = unsigned int;
@@ -21,38 +22,54 @@ enum { CurNormal, CurResize, CurMove, CurLast };	/* cursor */
 
 
 union Arg {
-	const char *cmd;
-	int i;
+    const char *cmd;
+    int i;
 }; /* argument type */
 
 struct Client {
-	char name[256];
-	int x, y, w, h;
-	int rx, ry, rw, rh; /* revert geometry */
-	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
-	int minax, minay, maxax, maxay;
-	long flags; 
-	uint border;
-	bool isfixed, isfloat, ismax, view;
-	Client *next;
-	Client *prev;
-	Client *snext;
-	Window win;
-    void configure();
-    void detachclient();
-    void focus();
-    static Client* getclient(Window w);
-    bool isprotodel();
-    void resize(bool sizeHints);
-    void updatesizehints();
-    void updatetitle();
-    void unmanage();
-    void pop();
-    bool isFloat();
-    void togglemax();
-    
+    public:
+        static Client* getclient(Window w);
+        static std::list<Client>& getClients() noexcept;
+        static Client* getSelection() noexcept { return _selection; }
+        static void setSelection(Client* target) noexcept { _selection = target; }
+        static Client* getStack() noexcept { return _stack; }
+        static void setStack(Client* target) noexcept { _stack = target; }
+    private:
+        static Client* _selection;
+        static Client* _stack;
+    public:
+        ~Client();
+        void configure();
+        void detachclient();
+        void focus();
+        bool isprotodel();
+        void resize(bool sizeHints);
+        void updatesizehints();
+        void updatetitle();
+        void unmanage();
+        void pop();
+        bool isFloat();
+        void togglemax();
+        void movemouse();
+        void resizemouse();
+    public:
+        std::string _name;
+        int x, y, w, h;
+        int rx, ry, rw, rh; /* revert geometry */
+        int basew, baseh, incw, inch, maxw, maxh, minw, minh;
+        int minax, minay, maxax, maxay;
+        long flags; 
+        uint border;
+        bool isfixed, isfloat, ismax, view;
+#if 0
+        Client *next;
+        Client *prev;
+#endif
+        Client *snext;
+        Window win;
 
-    ~Client();
+
+
 };
 
 extern int screen, sx, sy, sw, sh;		/* screen geometry */
@@ -61,7 +78,7 @@ extern uint numlockmask;		/* dynamic key lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern Atom wmatom[WMLast], netatom[NetLast];
 extern bool running, selscreen, view;
-extern Client *clients, *sel, *stack;		/* global client list and stack */
+extern Client *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern ulong normcol, selcol;		/* sel/normal color */
 extern Display *dpy;

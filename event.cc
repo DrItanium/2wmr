@@ -20,19 +20,19 @@ KEYS
 #define CLEANMASK(mask) (mask & ~(numlockmask | LockMask))
 #define MOUSEMASK		(BUTTONMASK | PointerMotionMask)
 
-static void
-movemouse(Client *c) {
+void
+Client::movemouse() {
 	int x1, y1, ocx, ocy, di;
 	unsigned int dui;
 	Window dummy;
 	XEvent ev;
 
-	ocx = c->x;
-	ocy = c->y;
+	ocx = this->x;
+	ocy = this->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurMove], CurrentTime) != GrabSuccess)
 		return;
-	c->ismax = False;
+	this->ismax = False;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK | SubstructureRedirectMask, &ev);
@@ -47,44 +47,44 @@ movemouse(Client *c) {
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			c->x = ocx + (ev.xmotion.x - x1);
-			c->y = ocy + (ev.xmotion.y - y1);
-			if(auto val = abs(sx + c->x); val < SNAP) {
-				c->x = sx;
-            } else if(auto val2 = abs((sx + sw) - (c->x + c->w + 2 * c->border)); val2 < SNAP) {
-				c->x = sx + sw - c->w - 2 * c->border;
+			this->x = ocx + (ev.xmotion.x - x1);
+			this->y = ocy + (ev.xmotion.y - y1);
+			if(auto val = abs(sx + this->x); val < SNAP) {
+				this->x = sx;
+            } else if(auto val2 = abs((sx + sw) - (this->x + this->w + 2 * this->border)); val2 < SNAP) {
+				this->x = sx + sw - this->w - 2 * this->border;
             }
-			if(auto val = abs(sy - c->y); val < SNAP) {
-				c->y = sy;
-            } else if(auto val2 = abs((sy + sh) - (c->y + c->h + 2 * c->border)); val2 < SNAP) {
-				c->y = sy + sh - c->h - 2 * c->border;
+			if(auto val = abs(sy - this->y); val < SNAP) {
+				this->y = sy;
+            } else if(auto val2 = abs((sy + sh) - (this->y + this->h + 2 * this->border)); val2 < SNAP) {
+				this->y = sy + sh - this->h - 2 * this->border;
             }
-            c->resize(false);
+            this->resize(false);
 			break;
 		}
 	}
 }
 
-static void
-resizemouse(Client *c) {
+void
+Client::resizemouse() {
 	int ocx, ocy;
 	int nw, nh;
 	XEvent ev;
 
-	ocx = c->x;
-	ocy = c->y;
+	ocx = this->x;
+	ocy = this->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 			None, cursor[CurResize], CurrentTime) != GrabSuccess)
 		return;
-	c->ismax = False;
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->border - 1, c->h + c->border - 1);
+	this->ismax = False;
+	XWarpPointer(dpy, None, this->win, 0, 0, 0, 0, this->w + this->border - 1, this->h + this->border - 1);
 	for(;;) {
 		XMaskEvent(dpy, MOUSEMASK | SubstructureRedirectMask , &ev);
 		switch(ev.type) {
 		case ButtonRelease:
-			resize(c, True);
-			XWarpPointer(dpy, None, c->win, 0, 0, 0, 0,
-					c->w + c->border - 1, c->h + c->border - 1);
+            c->resize(true);
+			XWarpPointer(dpy, None, this->win, 0, 0, 0, 0,
+					this->w + this->border - 1, this->h + this->border - 1);
 			XUngrabPointer(dpy, CurrentTime);
 			while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 			return;
@@ -94,11 +94,11 @@ resizemouse(Client *c) {
 			break;
 		case MotionNotify:
 			XSync(dpy, False);
-			nw = ev.xmotion.x - ocx - 2 * c->border + 1;
-			c->w = nw > 0 ? nw : 1;
-			nh = ev.xmotion.y - ocy - 2 * c->border + 1;
-			c->h = nh > 0 ? nh : 1;
-			resize(c, True);
+			nw = ev.xmotion.x - ocx - 2 * this->border + 1;
+			this->w = nw > 0 ? nw : 1;
+			nh = ev.xmotion.y - ocy - 2 * this->border + 1;
+			this->h = nh > 0 ? nh : 1;
+            c->resize(true);
 			break;
 		}
 	}

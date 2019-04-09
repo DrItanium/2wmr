@@ -21,7 +21,7 @@ static RReg *rreg = NULL;
 static unsigned int reglen = 0;
 
 static Client *
-getnext(Client *c) {
+Client::getnext(Client *c) {
 	for(; c && c->view != view; c = c->next);
 	return c;
 }

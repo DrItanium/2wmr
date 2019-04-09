@@ -7,6 +7,14 @@
 #include <X11/Xatom.h>
 #include <X11/Xutil.h>
 
+Client* Client::_selection = nullptr;
+Client* Client::_stack = nullptr;
+std::list<Client>&
+Client::getClients() noexcept {
+    static std::list<Client> _clients;
+    return _clients;
+}
+
 /* static */
 
 static void

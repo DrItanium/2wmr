@@ -154,10 +154,11 @@ void
 killclient(Arg *arg) {
 	if(!sel)
 		return;
-	if(isprotodel(sel))
-		sendevent(sel->win, wmatom[WMProtocols], wmatom[WMDelete]);
-	else
+	if(sel->isprotodel()) {
+		sendevent(sel->win, wmatom[WMProtocols], wmatom[WMDelete]); 
+    } else {
 		XKillClient(dpy, sel->win);
+    }
 }
 
 void
@@ -187,29 +188,35 @@ manage(Window w, XWindowAttributes *wa) {
 		if(c->y < sy)
 			c->y = sy;
 	}
-	updatesizehints(c);
+    c->updatesizehints();
 	XSelectInput(dpy, c->win,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &trans);
 	grabbuttons(c, False);
 	XSetWindowBorder(dpy, c->win, normcol);
-	updatetitle(c);
-	if((t = getclient(trans)))
+	c->updatetitle();
+    t = Client::getclient(trans);
+    if (t) {
 		c->view = t->view;
-	else
+    } else {
 		c->view = view;
-	if(!(c->isfloat = isfloat(c)))
+    }
+	if(!(c->isfloat = isfloat(c))) {
 		c->isfloat = t || c->isfixed;
-	if(clients)
+    }
+	if(clients) {
 		clients->prev = c;
+    }
 	c->next = clients;
 	c->snext = stack;
-	stack = clients = c;
+	clients = c;
+    stack = c;
 	XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	XMapWindow(dpy, c->win);
 	setclientstate(c, NormalState);
-	if(c->view == view)
-		focus(c);
+	if(c->view == view) {
+        c->focus();
+    }
 	arrange();
 }
 
@@ -275,7 +282,7 @@ resize(Client *c, Bool sizehints) {
 	wc.height = c->h;
 	wc.border_width = c->border;
 	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
-	configure(c);
+    c->configure();
 	XSync(dpy, False);
 }
 

@@ -8,12 +8,12 @@
 
 /* static */
 
-typedef struct {
+struct Key {
 	unsigned long mod;
 	KeySym keysym;
 	void (*func)(Arg *arg);
 	Arg arg;
-} Key;
+};
 
 KEYS
 
@@ -49,15 +49,17 @@ movemouse(Client *c) {
 			XSync(dpy, False);
 			c->x = ocx + (ev.xmotion.x - x1);
 			c->y = ocy + (ev.xmotion.y - y1);
-			if(abs(sx + c->x) < SNAP)
+			if(auto val = abs(sx + c->x); val < SNAP) {
 				c->x = sx;
-			else if(abs((sx + sw) - (c->x + c->w + 2 * c->border)) < SNAP)
+            } else if(auto val2 = abs((sx + sw) - (c->x + c->w + 2 * c->border)); val2 < SNAP) {
 				c->x = sx + sw - c->w - 2 * c->border;
-			if(abs(sy - c->y) < SNAP)
+            }
+			if(auto val = abs(sy - c->y); val < SNAP) {
 				c->y = sy;
-			else if(abs((sy + sh) - (c->y + c->h + 2 * c->border)) < SNAP)
+            } else if(auto val2 = abs((sy + sh) - (c->y + c->h + 2 * c->border)); val2 < SNAP) {
 				c->y = sy + sh - c->h - 2 * c->border;
-			resize(c, False);
+            }
+            c->resize(false);
 			break;
 		}
 	}

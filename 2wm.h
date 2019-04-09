@@ -60,17 +60,17 @@ extern Display *dpy;
 extern Window root;
 
 /* client.c */
-void configure(Client *c);		/* send synthetic configure event */
-void detachclient(Client *c);		/* detaches c from global client list */
-void focus(Client *c);			/* focus c, c may be NULL */
-Client *getclient(Window w);		/* return client of w */
-Bool isprotodel(Client *c);		/* returns True if c->win supports wmatom[WMDelete] */
+//void configure(Client *c);		/* send synthetic configure event */
+//void detachclient(Client *c);		/* detaches c from global client list */
+//void focus(Client *c);			/* focus c, c may be NULL */
+//Client *getclient(Window w);		/* return client of w */
+//Bool isprotodel(Client *c);		/* returns True if c->win supports wmatom[WMDelete] */
 void killclient(Arg *arg);		/* kill c nicely */
 void manage(Window w, XWindowAttributes *wa);	/* manage new client */
-void resize(Client *c, Bool sizehints);	/* resize c*/
-void updatesizehints(Client *c);		/* update the size hint variables of c */
-void updatetitle(Client *c);		/* update the name of c */
-void unmanage(Client *c);		/* destroy c */
+//void resize(Client *c, Bool sizehints);	/* resize c*/
+//void updatesizehints(Client *c);		/* update the size hint variables of c */
+//void updatetitle(Client *c);		/* update the name of c */
+//void unmanage(Client *c);		/* destroy c */
 
 /* event.c */
 void grabkeys(void);			/* grab all keys defined in config.h */

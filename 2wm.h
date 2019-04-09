@@ -8,7 +8,10 @@
 #include <X11/Xlib.h>
 #include <utility>
 #include <iostream>
+#include <cstdint>
 
+using ulong = unsigned long;
+using uint = unsigned int;
 /* mask shorthands, used in event.c and client.c */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
 
@@ -29,7 +32,7 @@ struct Client {
 	int basew, baseh, incw, inch, maxw, maxh, minw, minh;
 	int minax, minay, maxax, maxay;
 	long flags; 
-	unsigned int border;
+	uint border;
 	Bool isfixed, isfloat, ismax, view;
 	Client *next;
 	Client *prev;
@@ -48,14 +51,14 @@ struct Client {
 };
 
 extern int screen, sx, sy, sw, sh;		/* screen geometry */
-extern unsigned int master, nmaster;		/* master percent, number of master clients */
-extern unsigned int numlockmask;		/* dynamic key lock mask */
+extern uint master, nmaster;		/* master percent, number of master clients */
+extern uint numlockmask;		/* dynamic key lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern Atom wmatom[WMLast], netatom[NetLast];
 extern Bool running, selscreen, view;
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
-extern unsigned long normcol, selcol;		/* sel/normal color */
+extern ulong normcol, selcol;		/* sel/normal color */
 extern Display *dpy;
 extern Window root;
 
@@ -81,7 +84,7 @@ void sendevent(Window w, Atom a, long value);	/* send synthetic event to w */
 int xerror(Display *dsply, XErrorEvent *ee);	/* 2wm's X error handler */
 
 /* util.c */
-void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
+void *emallocz(uint size);	/* allocates zero-initialized memory, exits on error */
 //void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
 template<typename ... Args>
 void print(std::ostream& os, Args&& ... args) {

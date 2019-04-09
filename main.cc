@@ -18,26 +18,26 @@
 /* extern */
 
 int screen, sx, sy, sw, sh;
-unsigned int master, nmaster, numlockmask;
-unsigned long normcol, selcol;
+uint master, nmaster, numlockmask;
+ulong normcol, selcol;
 Atom wmatom[WMLast], netatom[NetLast];
-Bool running = True;
-Bool selscreen = True;
-Bool view = True;
-Client *clients = NULL;
-Client *sel = NULL;
-Client *stack = NULL;
+bool running = true;
+bool selscreen = true;
+bool view = true;
+Client *clients = nullptr;
+Client *sel = nullptr;
+Client *stack = nullptr;
 Cursor cursor[CurLast];
 Display *dpy;
 Window root;
 
 /* static */
 
-static int (*xerrorxlib)(Display *, XErrorEvent *);
-static Bool otherwm;
+static std::function<int(Display*, XErrorEvent*)> xerrorxlib;
+static bool otherwm;
 
-static unsigned long
-getcolor(const char *colstr) {
+static ulong 
+getcolor(const std::string& colstr) {
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor color;
 
@@ -64,23 +64,26 @@ cleanup(void) {
 
 static void
 scan(void) {
-	unsigned int i, num;
-	Window *wins, d1, d2;
+	Window d1, d2;
 	XWindowAttributes wa;
 
-	wins = NULL;
-	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
-		for(i = 0; i < num; i++) {
-			if(!XGetWindowAttributes(dpy, wins[i], &wa))
+	Window* wins = nullptr;
+	if(uint num; XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
+		for(uint i = 0; i < num; i++) {
+			if(!XGetWindowAttributes(dpy, wins[i], &wa)) {
 				continue;
-			if(wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1))
+            }
+			if(wa.override_redirect || XGetTransientForHint(dpy, wins[i], &d1)) {
 				continue;
-			if(wa.map_state == IsViewable)
+            }
+			if(wa.map_state == IsViewable) {
 				manage(wins[i], &wa);
+            }
 		}
 	}
-	if(wins)
+	if(wins) {
 		XFree(wins);
+    }
 }
 
 /*
@@ -169,7 +172,7 @@ main(int argc, char *argv[]) {
     }
 
 	XSync(dpy, False);
-	XSetErrorHandler(NULL);
+	XSetErrorHandler(nullptr);
 	xerrorxlib = XSetErrorHandler(xerror);
 	XSync(dpy, False);
 

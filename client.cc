@@ -25,39 +25,39 @@ detachstack(Client *c) {
 }
 
 static void
-grabbuttons(Client *c, Bool focused) {
+grabbuttons(Client *c, bool focused) {
 	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
 
 	if(focused) {
-		XGrabButton(dpy, Button1, MODKEY, c->win, False, BUTTONMASK,
+		XGrabButton(dpy, Button1, MODKEY, c->win, false, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button1, MODKEY | LockMask, c->win, False, BUTTONMASK,
+		XGrabButton(dpy, Button1, MODKEY | LockMask, c->win, false, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button1, MODKEY | numlockmask, c->win, False, BUTTONMASK,
+		XGrabButton(dpy, Button1, MODKEY | numlockmask, c->win, false, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button1, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-
-		XGrabButton(dpy, Button2, MODKEY, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button2, MODKEY | LockMask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button2, MODKEY | numlockmask, c->win, False, BUTTONMASK,
-				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button2, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
+		XGrabButton(dpy, Button1, MODKEY | numlockmask | LockMask, c->win, false, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
 
-		XGrabButton(dpy, Button3, MODKEY, c->win, False, BUTTONMASK,
+		XGrabButton(dpy, Button2, MODKEY, c->win, false, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button3, MODKEY | LockMask, c->win, False, BUTTONMASK,
+		XGrabButton(dpy, Button2, MODKEY | LockMask, c->win, false, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button3, MODKEY | numlockmask, c->win, False, BUTTONMASK,
+		XGrabButton(dpy, Button2, MODKEY | numlockmask, c->win, false, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
-		XGrabButton(dpy, Button3, MODKEY | numlockmask | LockMask, c->win, False, BUTTONMASK,
+		XGrabButton(dpy, Button2, MODKEY | numlockmask | LockMask, c->win, false, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+
+		XGrabButton(dpy, Button3, MODKEY, c->win, false, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button3, MODKEY | LockMask, c->win, false, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button3, MODKEY | numlockmask, c->win, false, BUTTONMASK,
+				GrabModeAsync, GrabModeSync, None, None);
+		XGrabButton(dpy, Button3, MODKEY | numlockmask | LockMask, c->win, false, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
 	}
 	else
-		XGrabButton(dpy, AnyButton, AnyModifier, c->win, False, BUTTONMASK,
+		XGrabButton(dpy, AnyButton, AnyModifier, c->win, false, BUTTONMASK,
 				GrabModeAsync, GrabModeSync, None, None);
 }
 
@@ -89,7 +89,7 @@ Client::configure() {
 	synev.xconfigure.height = this->h;
 	synev.xconfigure.border_width = this->border;
 	synev.xconfigure.above = None;
-	XSendEvent(dpy, this->win, True, NoEventMask, &synev);
+	XSendEvent(dpy, this->win, true, NoEventMask, &synev);
 }
 
 void
@@ -112,13 +112,13 @@ Client::focus() {
         return;
     }
 	if(sel && sel != this) {
-		grabbuttons(sel, False);
+		grabbuttons(sel, false);
 		XSetWindowBorder(dpy, sel->win, normcol);
 	}
     detachstack(this);
     this->snext = stack;
     stack = this;
-    grabbuttons(this, True);
+    grabbuttons(this, true);
 	sel = this;
 	if(!selscreen) {
 		return;
@@ -200,7 +200,7 @@ manage(Window w, XWindowAttributes *wa) {
 	XSelectInput(dpy, c->win,
 		StructureNotifyMask | PropertyChangeMask | EnterWindowMask);
 	XGetTransientForHint(dpy, c->win, &trans);
-	grabbuttons(c, False);
+	grabbuttons(c, false);
 	XSetWindowBorder(dpy, c->win, normcol);
 	c->updatetitle();
     t = Client::getclient(trans);
@@ -229,7 +229,7 @@ manage(Window w, XWindowAttributes *wa) {
 }
 
 void
-resize(Client *c, Bool sizehints) {
+resize(Client *c, bool sizehints) {
 	float actual, dx, dy, max, min;
 	XWindowChanges wc;
 
@@ -291,7 +291,7 @@ resize(Client *c, Bool sizehints) {
 	wc.border_width = c->border;
 	XConfigureWindow(dpy, c->win, CWX | CWY | CWWidth | CWHeight | CWBorderWidth, &wc);
     c->configure();
-	XSync(dpy, False);
+	XSync(dpy, false);
 }
 
 void
@@ -340,7 +340,7 @@ updatesizehints(Client *c) {
 
 void
 updatetitle(Client *c) {
-	char **list = NULL;
+	char **list = nullptr;
 	int n;
 	XTextProperty name;
 
@@ -378,7 +378,7 @@ Client::~Client() {
 	}
 	XUngrabButton(dpy, AnyButton, AnyModifier, this->win);
 	setclientstate(this, WithdrawnState);
-	XSync(dpy, False);
+	XSync(dpy, false);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);
 	arrange();

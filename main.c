@@ -230,8 +230,10 @@ main(int argc, char *argv[]) {
 
 	while(running) {
 	 	XNextEvent(dpy, &ev);
-		if(handler[ev.type])
+        fprintf(stderr, "%s, %d: [%s]: ev.type = %d\n", HERE__, ev.type);
+		if(handler[ev.type]) {
 			(handler[ev.type])(&ev); /* call handler */
+        }
 	}
 	cleanup();
 	XCloseDisplay(dpy);

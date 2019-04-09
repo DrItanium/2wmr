@@ -38,16 +38,19 @@ static Bool otherwm;
 
 static unsigned long
 getcolor(const char *colstr) {
+    ENTER_FUNC;
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor color;
 
 	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color))
 		eprint("error, cannot allocate color '%s'\n", colstr);
+    EXIT_FUNC;
 	return color.pixel;
 }
 
 static void
 cleanup(void) {
+    ENTER_FUNC;
 	close(STDIN_FILENO);
 	while(stack) {
 		resize(stack, True);
@@ -59,6 +62,7 @@ cleanup(void) {
 	XFreeCursor(dpy, cursor[CurMove]);
 	XSetInputFocus(dpy, PointerRoot, RevertToPointerRoot, CurrentTime);
 	XSync(dpy, False);
+    EXIT_FUNC;
 }
 
 static void
@@ -67,6 +71,7 @@ scan(void) {
 	Window *wins, d1, d2;
 	XWindowAttributes wa;
 
+    ENTER_FUNC;
 	wins = NULL;
 	if(XQueryTree(dpy, root, &d1, &d2, &wins, &num)) {
 		for(i = 0; i < num; i++) {
@@ -80,6 +85,7 @@ scan(void) {
 	}
 	if(wins)
 		XFree(wins);
+    EXIT_FUNC;
 }
 
 /*
@@ -88,7 +94,9 @@ scan(void) {
  */
 static int
 xerrorstart(Display *dsply, XErrorEvent *ee) {
+    ENTER_FUNC;
 	otherwm = True;
+    EXIT_FUNC;
 	return -1;
 }
 
@@ -98,6 +106,7 @@ void
 sendevent(Window w, Atom a, long value) {
 	XEvent e;
 
+    ENTER_FUNC;
 	e.type = ClientMessage;
 	e.xclient.window = w;
 	e.xclient.message_type = a;
@@ -106,11 +115,14 @@ sendevent(Window w, Atom a, long value) {
 	e.xclient.data.l[1] = CurrentTime;
 	XSendEvent(dpy, w, False, NoEventMask, &e);
 	XSync(dpy, False);
+    EXIT_FUNC;
 }
 
 void
 quit(Arg *arg) {
+    ENTER_FUNC;
 	running = False;
+    EXIT_FUNC;
 }
 
 /* There's no sy to check accesses to destroyed windows, thus those cases are
@@ -119,6 +131,7 @@ quit(Arg *arg) {
  */
 int
 xerror(Display *dpy, XErrorEvent *ee) {
+    ENTER_FUNC;
 	if(ee->error_code == BadWindow
 	|| (ee->request_code == X_SetInputFocus && ee->error_code == BadMatch)
 	|| (ee->request_code == X_PolyText8 && ee->error_code == BadDrawable)
@@ -126,10 +139,13 @@ xerror(Display *dpy, XErrorEvent *ee) {
 	|| (ee->request_code == X_PolySegment && ee->error_code == BadDrawable)
 	|| (ee->request_code == X_ConfigureWindow && ee->error_code == BadMatch)
 	|| (ee->request_code == X_GrabKey && ee->error_code == BadAccess)
-	|| (ee->request_code == X_CopyArea && ee->error_code == BadDrawable))
+	|| (ee->request_code == X_CopyArea && ee->error_code == BadDrawable)) {
+        EXIT_FUNC;
 		return 0;
+    }
 	fprintf(stderr, "2wm: fatal error: request code=%d, error code=%d\n",
 		ee->request_code, ee->error_code);
+    EXIT_FUNC;
 	return xerrorxlib(dpy, ee); /* may call exit */
 }
 

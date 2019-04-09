@@ -47,6 +47,9 @@ struct Client {
     void updatesizehints();
     void updatetitle();
     void unmanage();
+    void pop();
+    bool isFloat();
+
     ~Client();
 };
 

@@ -8,6 +8,7 @@
 #include <string.h>
 #include <sys/types.h>
 #include <X11/Xutil.h>
+#include <sstream>
 
 
 typedef struct { regex_t *regex; } RReg;
@@ -37,13 +38,14 @@ nexttiled(Client *c) {
 	return c;
 }
 
-static void
-pop(Client *c) {
-	detachclient(c);
-	if(clients)
-		clients->prev = c;
-	c->next = clients;
-	clients = c;
+void
+Client::pop() {
+    detachclient();
+	if(clients) {
+		clients->prev = this;
+    }
+    this->next = clients;
+	clients = this;
 }
 
 static void
@@ -65,7 +67,7 @@ togglemax(Client *c) {
 		c->w = c->rw;
 		c->h = c->rh;
 	}
-	resize(c, True);
+    c->resize(true);
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
@@ -87,7 +89,7 @@ arrange(void) {
 	for(i = 0, c = clients; c; c = c->next)
 		if(c->view == view) {
 			if(c->isfloat) {
-				resize(c, True);
+				c->resize(true);
 				continue;
 			}
 			c->ismax = False;
@@ -108,14 +110,14 @@ arrange(void) {
 				else /* fallback if th <= 2 * BORDERPX */
 					c->h = sh - 2 * BORDERPX;
 			}
-			resize(c, False);
+            c->resize(false);
 			i++;
 		}
 		else
 			XMoveWindow(dpy, c->win, c->x + 2 * sw, c->y);
 	if(!sel || sel->view != view) {
 		for(c = stack; c && c->view != view; c = c->snext);
-		focus(c);
+        c->focus();
 	}
 	restack();
 }
@@ -128,8 +130,8 @@ attach(Arg *arg) {
 	if(!c)
 		return;
 	c->view = !c->view;
-	pop(c);
-	focus(c);
+    c->pop();
+    c->focus();
 	arrange();
 }
 
@@ -138,7 +140,7 @@ detach(Arg *arg) {
 	if(!sel)
 		return;
 	sel->view = !sel->view;
-	pop(sel);
+    sel->pop();
 	arrange();
 }
 
@@ -151,23 +153,25 @@ focusnext(Arg *arg) {
 	if(!(c = getnext(sel->next)))
 		c = getnext(clients);
 	if(c) {
-		focus(c);
+        c->focus();
 		restack();
 	}
 }
 
 void
 focusprev(Arg *arg) {
-	Client *c;
+	//Client *c;
 
-	if(!sel)
+	if(!sel) {
 		return;
-	if(!(c = getprev(sel->prev))) {
+    }
+    auto c = getprev(sel->prev);
+    if (!c) {
 		for(c = clients; c && c->next; c = c->next);
 		c = getprev(c);
 	}
 	if(c) {
-		focus(c);
+        c->focus();
 		restack();
 	}
 }
@@ -189,49 +193,56 @@ initrregs(void) {
 	if(rreg)
 		return;
 	for(reglen = 0; floats[reglen]; reglen++);
-	rreg = emallocz(reglen * sizeof(RReg));
+    rreg = new RReg[reglen];
 	for(i = 0; i < reglen; i++)
 		if(floats[i]) {
-			reg = emallocz(sizeof(regex_t));
-			if(regcomp(reg, floats[i], REG_EXTENDED))
-				free(reg);
-			else
+            reg = new regex_t;
+			if(regcomp(reg, floats[i], REG_EXTENDED)) {
+                delete reg;
+            } else {
 				rreg[i].regex = reg;
+            }
 		}
 }
 
-Bool
-isfloat(Client *c) {
-	char prop[512];
+bool
+Client::isFloat() {
 	unsigned int i;
 	regmatch_t tmp;
 	Bool ret = False;
 	XClassHint ch = { 0 };
 
-	XGetClassHint(dpy, c->win, &ch);
-	snprintf(prop, sizeof prop, "%s:%s:%s",
-			ch.res_class ? ch.res_class : "",
-			ch.res_name ? ch.res_name : "", c->name);
+	XGetClassHint(dpy, win, &ch);
+    std::stringstream ss;
+    print(ss, ch.res_class ? ch.res_class : "",
+              ":",
+              ch.res_name ? ch.res_name : "",
+              ":",
+              name);
+    auto str = ss.str();
 	for(i = 0; i < reglen; i++)
-		if(rreg[i].regex && !regexec(rreg[i].regex, prop, 1, &tmp, 0)) {
+		if(rreg[i].regex && !regexec(rreg[i].regex, str.c_str(), 1, &tmp, 0)) {
 			ret = True;
 			break;
 		}
-	if(ch.res_class)
+	if(ch.res_class) {
 		XFree(ch.res_class);
-	if(ch.res_name)
+    }
+	if(ch.res_name) {
 		XFree(ch.res_name);
+    }
 	return ret;
 }
 
 void
 resizemaster(Arg *arg) {
-	if(arg->i == 0)
+	if(arg->i == 0) {
 		master = MASTER;
-	else {
+    } else {
 		if(sw * (master + arg->i) / 1000 >= sw - 2 * BORDERPX
-			|| sw * (master + arg->i) / 1000 <= 2 * BORDERPX)
+			|| sw * (master + arg->i) / 1000 <= 2 * BORDERPX) {
 			return;
+        }
 		master += arg->i;
 	}
 	arrange();
@@ -239,28 +250,31 @@ resizemaster(Arg *arg) {
 
 void
 restack(void) {
-	Client *c;
-	XEvent ev;
 
-	if(!sel)
+	if(!sel) {
 		return;
-	if(sel->isfloat)
+    }
+	if(sel->isfloat) {
 		XRaiseWindow(dpy, sel->win);
-	else
+    } else {
 		XLowerWindow(dpy, sel->win);
-	for(c = nexttiled(clients); c; c = nexttiled(c->next)) {
-		if(c == sel)
+    }
+	for(Client* c = nexttiled(clients); c; c = nexttiled(c->next)) {
+		if(c == sel) {
 			continue;
+        }
 		XLowerWindow(dpy, c->win);
 	}
 	XSync(dpy, False);
+	XEvent ev;
 	while(XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
 void
 togglefloat(Arg *arg) {
-	if(!sel)
+	if(!sel) {
 		return;
+    }
 	sel->isfloat = !sel->isfloat;
 	arrange();
 }
@@ -273,22 +287,26 @@ toggleview(Arg *arg) {
 
 void
 zoom(Arg *arg) {
-	unsigned int n;
+	uint n;
 	Client *c;
 
-	if(!sel)
+	if(!sel) {
 		return;
+    }
 	if(sel->isfloat) {
 		togglemax(sel);
 		return;
 	}
-	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next))
+	for(n = 0, c = nexttiled(clients); c; c = nexttiled(c->next)) {
 		n++;
-
-	if((c = sel) == nexttiled(clients))
-		if(!(c = nexttiled(c->next)))
+    }
+    c = sel;
+	if(c == nexttiled(clients)) {
+		if(!(c = nexttiled(c->next))) { 
 			return;
-	pop(c);
-	focus(c);
+        }
+    }
+    c->pop();
+    c->focus();
 	arrange();
 }

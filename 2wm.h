@@ -33,7 +33,7 @@ struct Client {
 	int minax, minay, maxax, maxay;
 	long flags; 
 	uint border;
-	Bool isfixed, isfloat, ismax, view;
+	bool isfixed, isfloat, ismax, view;
 	Client *next;
 	Client *prev;
 	Client *snext;
@@ -46,7 +46,7 @@ struct Client {
     void resize(bool sizeHints);
     void updatesizehints();
     void updatetitle();
-    void unmange();
+    void unmanage();
     ~Client();
 };
 
@@ -55,7 +55,7 @@ extern uint master, nmaster;		/* master percent, number of master clients */
 extern uint numlockmask;		/* dynamic key lock mask */
 extern void (*handler[LASTEvent])(XEvent *);	/* event handler */
 extern Atom wmatom[WMLast], netatom[NetLast];
-extern Bool running, selscreen, view;
+extern bool running, selscreen, view;
 extern Client *clients, *sel, *stack;		/* global client list and stack */
 extern Cursor cursor[CurLast];
 extern ulong normcol, selcol;		/* sel/normal color */
@@ -67,10 +67,10 @@ extern Window root;
 //void detachclient(Client *c);		/* detaches c from global client list */
 //void focus(Client *c);			/* focus c, c may be NULL */
 //Client *getclient(Window w);		/* return client of w */
-//Bool isprotodel(Client *c);		/* returns True if c->win supports wmatom[WMDelete] */
+//bool isprotodel(Client *c);		/* returns True if c->win supports wmatom[WMDelete] */
 void killclient(Arg *arg);		/* kill c nicely */
 void manage(Window w, XWindowAttributes *wa);	/* manage new client */
-//void resize(Client *c, Bool sizehints);	/* resize c*/
+//void resize(Client *c, bool sizehints);	/* resize c*/
 //void updatesizehints(Client *c);		/* update the size hint variables of c */
 //void updatetitle(Client *c);		/* update the name of c */
 //void unmanage(Client *c);		/* destroy c */
@@ -93,7 +93,7 @@ void print(std::ostream& os, Args&& ... args) {
 
 template<typename ... Args>
 void eprint(Args&& ... args) {
-    print(std::cerr, std::forward(args)...);
+    print(std::cerr, args...);
 }
 void spawn(Arg *arg);			/* forks a new subprocess with to arg's cmd */
 
@@ -105,7 +105,7 @@ void focusnext(Arg *arg);		/* focuses next visible client, arg is ignored  */
 void focusprev(Arg *arg);		/* focuses previous visible client, arg is ignored */
 void incnmaster(Arg *arg);		/* increments nmaster with arg's index value */
 void initrregs(void);			/* initialize regexps of rules defined in config.h */
-Bool isfloat(Client *c);			/* returns True if c is floatings */
+bool isfloat(Client *c);			/* returns True if c is floatings */
 void resizemaster(Arg *arg);		/* resizes the master percent with arg's index value */
 void restack(void);			/* restores z layers of all clients */
 void togglefloat(Arg *arg);		/* toggles focusesd client between floating/non-floating state */

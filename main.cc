@@ -14,6 +14,7 @@
 #include <X11/keysym.h>
 #include <X11/Xatom.h>
 #include <X11/Xproto.h>
+#include <functional>
 
 /* extern */
 
@@ -41,7 +42,7 @@ getcolor(const std::string& colstr) {
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor color;
 
-	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color)) {
+	if(!XAllocNamedColor(dpy, cmap, colstr.c_str(), &color, &color)) {
         eprint("error, cannot allocate color '", colstr, "'\n");
     }
 	return color.pixel;
@@ -51,8 +52,8 @@ static void
 cleanup(void) {
 	close(STDIN_FILENO);
 	while(stack) {
-		resize(stack, True);
-		unmanage(stack);
+        stack->resize(true);
+        stack->unmanage();
 	}
 	XUngrabKey(dpy, AnyKey, AnyModifier, root);
 	XFreeCursor(dpy, cursor[CurNormal]);

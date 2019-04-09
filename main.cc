@@ -41,8 +41,9 @@ getcolor(const char *colstr) {
 	Colormap cmap = DefaultColormap(dpy, screen);
 	XColor color;
 
-	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color))
-		eprint("error, cannot allocate color '%s'\n", colstr);
+	if(!XAllocNamedColor(dpy, cmap, colstr, &color, &color)) {
+        eprint("error, cannot allocate color '", colstr, "'\n");
+    }
 	return color.pixel;
 }
 
@@ -142,14 +143,16 @@ main(int argc, char *argv[]) {
 	XModifierKeymap *modmap;
 	XSetWindowAttributes wa;
 
-	if(argc == 2 && !strncmp("-v", argv[1], 3))
-		eprint("2wm-"VERSION", (C)opyright MMVII Anselm R. Garbe\n");
-	else if(argc != 1)
+	if(argc == 2 && !strncmp("-v", argv[1], 3)) {
+		eprint("2wmr-", VERSION, ", (C)opyright 2019 Joshua Scoggins, based on 2wm by Anselm R. Garbe\n");
+    } else if(argc != 1) {
 		eprint("usage: 2wm [-v]\n");
+    }
 	setlocale(LC_CTYPE, "");
 	dpy = XOpenDisplay(0);
-	if(!dpy)
+	if(!dpy) {
 		eprint("2wm: cannot open display\n");
+    }
 	screen = DefaultScreen(dpy);
 	root = RootWindow(dpy, screen);
 	otherwm = False;
@@ -157,8 +160,9 @@ main(int argc, char *argv[]) {
 	/* this causes an error if some other window manager is running */
 	XSelectInput(dpy, root, SubstructureRedirectMask);
 	XSync(dpy, False);
-	if(otherwm)
+	if(otherwm) {
 		eprint("2wm: another window manager is already running\n");
+    }
 
 	XSync(dpy, False);
 	XSetErrorHandler(NULL);

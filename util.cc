@@ -2,6 +2,7 @@
  * See LICENSE file for license details.
  */
 #include "2wm.h"
+#include <iostream>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,19 +16,20 @@ emallocz(unsigned int size) {
 	void *res = calloc(1, size);
 
 	if(!res)
-		eprint("fatal: could not malloc() %u bytes\n", size);
+		eprint("fatal: could not malloc() ", size, " bytes\n");
 	return res;
 }
 
-void
-eprint(const char *errstr, ...) {
-	va_list ap;
 
-	va_start(ap, errstr);
-	vfprintf(stderr, errstr, ap);
-	va_end(ap);
-	exit(EXIT_FAILURE);
-}
+//void
+//eprint(const char *errstr, ...) {
+//	va_list ap;
+//
+//	va_start(ap, errstr);
+//	vfprintf(stderr, errstr, ap);
+//	va_end(ap);
+//	exit(EXIT_FAILURE);
+//}
 
 void
 spawn(Arg *arg) {

@@ -68,78 +68,83 @@ xerrordummy(Display *dsply, XErrorEvent *ee) {
 /* extern */
 
 void
-configure(Client *c) {
+Client::configure() {
 	XEvent synev;
 
 	synev.type = ConfigureNotify;
 	synev.xconfigure.display = dpy;
-	synev.xconfigure.event = c->win;
-	synev.xconfigure.window = c->win;
-	synev.xconfigure.x = c->x;
-	synev.xconfigure.y = c->y;
-	synev.xconfigure.width = c->w;
-	synev.xconfigure.height = c->h;
-	synev.xconfigure.border_width = c->border;
+	synev.xconfigure.event = this->win;
+	synev.xconfigure.window = this->win;
+	synev.xconfigure.x = this->x;
+	synev.xconfigure.y = this->y;
+	synev.xconfigure.width = this->w;
+	synev.xconfigure.height = this->h;
+	synev.xconfigure.border_width = this->border;
 	synev.xconfigure.above = None;
-	XSendEvent(dpy, c->win, True, NoEventMask, &synev);
+	XSendEvent(dpy, this->win, True, NoEventMask, &synev);
 }
 
 void
-detachclient(Client *c) {
-	if(c->prev)
-		c->prev->next = c->next;
-	if(c->next)
-		c->next->prev = c->prev;
-	if(c == clients)
-		clients = c->next;
-	c->next = c->prev = NULL;
+Client::detachclient() {
+	if(this->prev) {
+		this->prev->next = this->next;
+    }
+	if(this->next) {
+		this->next->prev = this->prev;
+    }
+	if(this == clients) {
+		clients = this->next;
+    }
+	this->next = this->prev = nullptr;
 }
 
 void
-focus(Client *c) {
-	if(c && c->view != view)
-		return;
-	if(sel && sel != c) {
+Client::focus() {
+    if (this->view != view) {
+        return;
+    }
+	if(sel && sel != this) {
 		grabbuttons(sel, False);
 		XSetWindowBorder(dpy, sel->win, normcol);
 	}
-	if(c) {
-		detachstack(c);
-		c->snext = stack;
-		stack = c;
-		grabbuttons(c, True);
-	}
-	sel = c;
-	if(!selscreen)
+    detachstack(this);
+    this->snext = stack;
+    stack = this;
+    grabbuttons(this, True);
+	sel = this;
+	if(!selscreen) {
 		return;
-	if(c) {
-		XSetWindowBorder(dpy, c->win, selcol);
-		XSetInputFocus(dpy, c->win, RevertToPointerRoot, CurrentTime);
-	}
-	else
+    }
+	if(this) {
+		XSetWindowBorder(dpy, this->win, selcol);
+		XSetInputFocus(dpy, this->win, RevertToPointerRoot, CurrentTime);
+	} else {
 		XSetInputFocus(dpy, root, RevertToPointerRoot, CurrentTime);
+    }
 }
 
 Client *
-getclient(Window w) {
-	Client *c;
-
-	for(c = clients; c; c = c->next)
-		if(c->win == w)
-			return c;
-	return NULL;
+Client::getclient(Window w) {
+	for(auto* c = clients; c; c = c->next) {
+        if (c->win == w) {
+            return c;
+        }
+    }
+    return nullptr;
 }
 
-Bool
-isprotodel(Client *c) {
-	int i, n;
+bool
+Client::isprotodel() {
+	int n;
 	Atom *protocols;
-	Bool ret = False;
+	bool ret = false;
 
-	if(XGetWMProtocols(dpy, c->win, &protocols, &n)) {
-		for(i = 0; !ret && i < n; i++)
-			if(protocols[i] == wmatom[WMDelete])
-				ret = True;
+	if(XGetWMProtocols(dpy, this->win, &protocols, &n)) {
+		for(auto i = 0; !ret && i < n; i++) {
+			if(protocols[i] == wmatom[WMDelete]) {
+                ret = true;
+            }
+        }
 		XFree(protocols);
 	}
 	return ret;
@@ -159,8 +164,8 @@ void
 manage(Window w, XWindowAttributes *wa) {
 	Client *c, *t;
 	Window trans;
-
-	c = emallocz(sizeof(Client));
+    c = new Client();
+	//c = emallocz(sizeof(Client));
 	c->win = w;
 	c->x = wa->x;
 	c->y = wa->y;
@@ -344,22 +349,20 @@ updatetitle(Client *c) {
 	XFree(name.value);
 }
 
-void
-unmanage(Client *c) {
+Client::~Client() {
 	Client *nc;
 
 	/* The server grab construct avoids race conditions. */
 	XGrabServer(dpy);
 	XSetErrorHandler(xerrordummy);
-	detachstack(c);
-	detachclient(c);
-	if(sel == c) {
+	detachstack(this);
+	detachclient();
+	if(sel == this) {
 		for(nc = stack; nc && (nc->view != view); nc = nc->snext);
-		focus(nc);
+        nc->focus();
 	}
-	XUngrabButton(dpy, AnyButton, AnyModifier, c->win);
-	setclientstate(c, WithdrawnState);
-	free(c);
+	XUngrabButton(dpy, AnyButton, AnyModifier, this->win);
+	setclientstate(this, WithdrawnState);
 	XSync(dpy, False);
 	XSetErrorHandler(xerror);
 	XUngrabServer(dpy);

@@ -268,8 +268,10 @@ resizemaster(Arg *arg) {
 		master = MASTER;
 	else {
 		if(sw * (master + arg->i) / 1000 >= sw - 2 * BORDERPX
-			|| sw * (master + arg->i) / 1000 <= 2 * BORDERPX)
+			|| sw * (master + arg->i) / 1000 <= 2 * BORDERPX) {
+            EXIT_FUNC;
 			return;
+        }
 		master += arg->i;
 	}
 	arrange();

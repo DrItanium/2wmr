@@ -40,8 +40,10 @@ spawn(Arg *arg) {
     ENTER_FUNC;
 	if(!shell && !(shell = getenv("SHELL")))
 		shell = "/bin/sh";
-	if(!arg->cmd)
+	if(!arg->cmd) {
+        EXIT_FUNC;
 		return;
+    }
 	/* The double-fork construct avoids zombie processes and keeps the code
 	 * clean from stupid signal handlers. */
 	if(fork() == 0) {

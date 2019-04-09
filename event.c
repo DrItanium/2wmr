@@ -27,11 +27,14 @@ movemouse(Client *c) {
 	Window dummy;
 	XEvent ev;
 
+    ENTER_FUNC;
 	ocx = c->x;
 	ocy = c->y;
 	if(XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
-			None, cursor[CurMove], CurrentTime) != GrabSuccess)
+			None, cursor[CurMove], CurrentTime) != GrabSuccess) {
+        EXIT_FUNC;
 		return;
+    }
 	c->ismax = False;
 	XQueryPointer(dpy, root, &dummy, &dummy, &x1, &y1, &di, &di, &dui);
 	for(;;) {
@@ -40,6 +43,7 @@ movemouse(Client *c) {
 		case ButtonRelease:
 			resize(c, True);
 			XUngrabPointer(dpy, CurrentTime);
+            EXIT_FUNC;
 			return;
 		case ConfigureRequest:
 		case MapRequest:
@@ -61,6 +65,7 @@ movemouse(Client *c) {
 			break;
 		}
 	}
+    EXIT_FUNC;
 }
 
 static void

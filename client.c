@@ -366,8 +366,10 @@ updatetitle(Client *c) {
 	XGetTextProperty(dpy, c->win, &name, netatom[NetWMName]);
 	if(!name.nitems)
 		XGetWMName(dpy, c->win, &name);
-	if(!name.nitems)
+	if(!name.nitems) {
+        EXIT_FUNC;
 		return;
+    }
 	if(name.encoding == XA_STRING)
 		strncpy(c->name, (char *)name.value, sizeof c->name);
 	else {

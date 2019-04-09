@@ -14,8 +14,10 @@ void *
 emallocz(unsigned int size) {
 	void *res = calloc(1, size);
 
+    ENTER_FUNC;
 	if(!res)
 		eprint("fatal: could not malloc() %u bytes\n", size);
+    EXIT_FUNC;
 	return res;
 }
 
@@ -23,16 +25,19 @@ void
 eprint(const char *errstr, ...) {
 	va_list ap;
 
+    ENTER_FUNC;
 	va_start(ap, errstr);
 	vfprintf(stderr, errstr, ap);
 	va_end(ap);
 	exit(EXIT_FAILURE);
+    EXIT_FUNC;
 }
 
 void
 spawn(Arg *arg) {
 	static char *shell = NULL;
 
+    ENTER_FUNC;
 	if(!shell && !(shell = getenv("SHELL")))
 		shell = "/bin/sh";
 	if(!arg->cmd)
@@ -51,4 +56,15 @@ spawn(Arg *arg) {
 		exit(0);
 	}
 	wait(0);
+    EXIT_FUNC;
+}
+
+void
+enterFunction(HERE_DECL__) {
+    fprintf(stderr, "%s, %d: Entered function %s\n", file, line, func);
+}
+
+void
+exitFunction(HERE_DECL__) {
+    fprintf(stderr, "%s, %d: Exiting function %s\n", file, line, func);
 }

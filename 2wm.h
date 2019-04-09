@@ -6,6 +6,10 @@
 #include <X11/Xlib.h>
 
 
+#define HERE__ __FILE__,  __LINE__, __FUNCTION__
+#define HERE_DECL__ const char* file, unsigned long line, const char* func
+#define HERE_ARGS__ file, line, func
+
 /* mask shorthands, used in event.c and client.c */
 #define BUTTONMASK		(ButtonPressMask | ButtonReleaseMask)
 
@@ -72,6 +76,10 @@ extern int xerror(Display *dsply, XErrorEvent *ee);	/* 2wm's X error handler */
 extern void *emallocz(unsigned int size);	/* allocates zero-initialized memory, exits on error */
 extern void eprint(const char *errstr, ...);	/* prints errstr and exits with 1 */
 extern void spawn(Arg *arg);			/* forks a new subprocess with to arg's cmd */
+extern void enterFunction(HERE_DECL__);
+extern void exitFunction(HERE_DECL__);
+#define ENTER_FUNC enterFunction(HERE__)
+#define EXIT_FUNC exitFunction(HERE__)
 
 /* view.c */
 extern void arrange(void);			/* arranges all windows tiled */

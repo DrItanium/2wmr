@@ -142,6 +142,7 @@ main(int argc, char *argv[]) {
 	XModifierKeymap *modmap;
 	XSetWindowAttributes wa;
 
+    ENTER_FUNC;
 	if(argc == 2 && !strncmp("-v", argv[1], 3))
 		eprint("2wm-"VERSION", (C)opyright MMVII Anselm R. Garbe\n");
 	else if(argc != 1)
@@ -218,5 +219,6 @@ main(int argc, char *argv[]) {
 	}
 	cleanup();
 	XCloseDisplay(dpy);
+    EXIT_FUNC;
 	return 0;
 }
